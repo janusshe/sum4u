@@ -5,7 +5,7 @@
 ## 🚀 功能特性
 
 - **多平台支持**: 支持YouTube和Bilibili视频下载
-- **音频文件上传**: 支持本地音频文件上传（MP3, WAV, M4A, AMR等格式，包括iPhone和Android语音备忘录）
+- **本地音频文件处理**: 支持上传本地音频文件（MP3, WAV, M4A, MP4, AAC, FLAC, WMA, AMR等格式，包括iPhone和Android语音备忘录）
 - **智能音频提取**: 自动提取视频音频并转换为MP3格式
 - **高质量转录**: 使用OpenAI Whisper进行本地音频转录，支持99种语言自动检测
 - **AI智能总结**: 使用多种AI模型生成结构化总结
@@ -123,6 +123,12 @@ python3 src/main.py --audio-file "/path/to/audio.mp3" --prompt_template "模板�
 python3 src/main.py --audio-file "/path/to/audio.mp3" --model "medium"
 ```
 
+**本地音频文件处理说明:**
+- 支持的音频格式：MP3, WAV, M4A, MP4, AAC, FLAC, WMA, AMR
+- 音频文件将自动转换为MP3格式进行处理
+- 可以指定音频语言以提高转录准确性
+- 处理流程：音频验证 → 格式转换 → 转录 → AI总结
+
 可用的Whisper模型大小：
 - `tiny`: 最快但准确性最低 (约32x实时速度)
 - `base`: 快速且准确 (约16x实时速度)
@@ -173,6 +179,7 @@ video_summarizer_cli/
 │   ├── transcribe.py     # 音频转录模块
 │   ├── summarize.py      # AI总结模块
 │   ├── prompts.py        # 预设提示词模板
+│   ├── batch_processor.py # 批量处理模块
 │   └── utils.py          # 工具函数模块
 ├── summaries/            # 输出总结文件
 ├── downloads/            # 下载的音频文件
@@ -182,8 +189,17 @@ video_summarizer_cli/
 ├── uv.lock               # uv依赖锁定文件
 ├── README.md             # 项目说明文档
 ├── start.sh              # 视频处理快速启动脚本
-└── start_audio.sh        # 音频处理快速启动脚本
+├── start_audio.sh        # 音频处理快速启动脚本
+└── batch_process.sh      # 批量处理启动脚本
 ```
+
+**核心模块说明:**
+- `audio.py`: 负责从YouTube、Bilibili等平台下载视频并提取音频
+- `audio_handler.py`: 处理本地音频文件上传，支持多种格式并转换为统一的MP3格式
+- `transcribe.py`: 使用Whisper模型将音频转换为文本
+- `summarize.py`: 调用AI模型对转录文本进行结构化总结
+- `prompts.py`: 包含多种总结模板，适用于不同场景
+- `batch_processor.py`: 支持批量处理多个音频文件
 
 ## 🆕 使用uv管理与项目结构
 
@@ -261,17 +277,39 @@ A:
 - 检查网络连接是否正常
 
 ### Q: 音频文件损坏？
-A: 
+A:
 - 确保ffmpeg正确安装
 - 检查磁盘空间是否充足
 - 重新下载视频
 
+### Q: 本地音频文件处理失败？
+A:
+- 确认音频格式支持（MP3, WAV, M4A, MP4, AAC, FLAC, WMA, AMR）
+- 检查文件路径是否正确
+- 确保文件没有损坏或加密保护
+- 确认文件大小，过大的文件可能需要更多处理时间
+
+### Q: 上传的音频文件如何处理？
+A:
+- 程序会自动验证音频格式
+- 将音频文件复制到downloads目录
+- 自动转换为MP3格式（如需要）
+- 然后进行转录和总结处理
+
 ## 📝 使用建议
 
 1. **选择合适的API**: DeepSeek API通常更稳定且价格更优惠
-2. **批量处理**: 可以编写脚本批量处理多个视频
-3. **定期清理**: 定期清理downloads文件夹中的音频文件
+2. **批量处理**: 可以编写脚本批量处理多个视频或音频文件
+3. **定期清理**: 定期清理downloads文件夹中的音频文件，特别是处理大文件后
 4. **备份重要总结**: 重要的总结文件建议备份到其他位置
+5. **音频文件处理**:
+   - 本地音频文件支持MP3, WAV, M4A, MP4, AAC, FLAC, WMA, AMR等格式
+   - 大文件（>100MB）会自动分段处理，可能需要较长时间
+   - 建议使用高质量音频以获得更好的转录效果
+6. **Whisper模型选择**:
+   - `tiny`或`base`: 适合快速处理和测试
+   - `small`: 平衡速度和准确性，推荐日常使用
+   - `medium`或`large`: 适合对准确性要求高的场景
 
 ## 🤝 贡献
 
