@@ -1,10 +1,11 @@
-# 视频总结工具 (Video Summarizer CLI)
+# 音频/视频总结工具 (Audio/Video Summarizer CLI)
 
-一个强大的Python命令行工具，用于自动下载视频、提取音频、转录音频内容并生成结构化总结。
+一个强大的Python命令行工具，用于自动处理视频和本地音频文件、转录音频内容并生成结构化总结。
 
 ## 🚀 功能特性
 
 - **多平台支持**: 支持YouTube和Bilibili视频下载
+- **音频文件上传**: 支持本地音频文件上传（MP3, WAV, M4A, AMR等格式，包括iPhone和Android语音备忘录）
 - **智能音频提取**: 自动提取视频音频并转换为MP3格式
 - **高质量转录**: 使用OpenAI Whisper进行本地音频转录，支持99种语言自动检测
 - **AI智能总结**: 使用多种AI模型生成结构化总结
@@ -77,10 +78,16 @@ python3 -c "import whisper; whisper.load_model('small')"
 
 ### 1. 使用快速启动脚本 (推荐)
 
-为了简化操作，项目提供了 `start.sh` 脚本，可以交互式地选择总结模板或自定义提示词。
+为了简化操作，项目提供了启动脚本，可以交互式地选择总结模板或自定义提示词。
 
+**处理视频:**
 ```bash
 ./start.sh "视频URL"
+```
+
+**处理本地音频文件:**
+```bash
+./start_audio.sh "音频文件路径"
 ```
 
 脚本会自动激活虚拟环境、运行主程序，并引导您选择一个预设的总结模板或输入自定义提示词。
@@ -89,6 +96,7 @@ python3 -c "import whisper; whisper.load_model('small')"
 
 您也可以直接运行 `src/main.py` 并通过参数指定总结模板或自定义提示词。
 
+**处理视频:**
 ```bash
 # 使用预设模板
 python3 src/main.py --url "视频URL" --prompt_template "模板名称"
@@ -98,6 +106,21 @@ python3 src/main.py --url "视频URL" --prompt "你的自定义提示词"
 
 # 设置Whisper模型大小
 python3 src/main.py --url "视频URL" --model "medium"
+```
+
+**处理本地音频文件:**
+```bash
+# 使用预设模板
+python3 src/main.py --audio-file "/path/to/audio.mp3" --prompt_template "模板名称"
+
+# 使用自定义提示词
+python3 src/main.py --audio-file "/path/to/audio.mp3" --prompt "你的自定义提示词"
+
+# 指定音频语言（可选，不指定则自动检测）
+python3 src/main.py --audio-file "/path/to/audio.mp3" --prompt_template "模板名称" --language "zh"
+
+# 设置Whisper模型大小
+python3 src/main.py --audio-file "/path/to/audio.mp3" --model "medium"
 ```
 
 可用的Whisper模型大小：
@@ -145,7 +168,8 @@ video_summarizer_cli/
 video_summarizer_cli/
 ├── src/                  # 主要源代码
 │   ├── main.py           # 主程序入口
-│   ├── audio.py          # 音频下载和提取模块
+│   ├── audio.py          # 视频音频下载和提取模块
+│   ├── audio_handler.py  # 本地音频文件处理模块
 │   ├── transcribe.py     # 音频转录模块
 │   ├── summarize.py      # AI总结模块
 │   ├── prompts.py        # 预设提示词模板
@@ -157,7 +181,8 @@ video_summarizer_cli/
 ├── pyproject.toml        # 项目配置文件
 ├── uv.lock               # uv依赖锁定文件
 ├── README.md             # 项目说明文档
-└── start.sh              # 快速启动脚本
+├── start.sh              # 视频处理快速启动脚本
+└── start_audio.sh        # 音频处理快速启动脚本
 ```
 
 ## 🆕 使用uv管理与项目结构
