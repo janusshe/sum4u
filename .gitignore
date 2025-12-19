@@ -117,4 +117,4 @@ cython_debug/
 # Output folders
 /downloads/
 /summaries/
-/transcriptions/.venv/
+/transcriptions/

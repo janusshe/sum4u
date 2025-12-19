@@ -12,6 +12,6 @@ requests>=2.31.0
 yt-dlp>=2023.12.30
 
 # 其他工具
-pathlib2>=2.3.7; python_version < "3.4" 
+pathlib2>=2.3.7; python_version < "3.4"
 # 推荐使用uv进行依赖和虚拟环境管理
-# 安装: pip install uv 
+# 安装: pip install uv

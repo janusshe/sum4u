@@ -2,7 +2,6 @@
 main.py
 命令行主入口。
 """
-
 import sys
 import os
 if __name__ == "__main__" and __package__ is None:
@@ -57,9 +56,10 @@ def main():
     parser = argparse.ArgumentParser(description="视频结构化总结工具")
     parser.add_argument("--url", required=True, help="视频链接（支持B站、YouTube等）")
 
+    parser.add_argument("--model", required=False, default="small", help="Whisper模型大小 (tiny, base, small, medium, large-v1, large-v2, large-v3)，默认small")
     parser.add_argument("--output", required=False, help="自定义输出文件名（可选）")
     parser.add_argument("--prompt", required=False, help="自定义摘要提示词")
-    parser.add_argument("--prompt_template", required=False, default="default", help="选择摘要提示词模板，可选: default, youtube_全面提取, youtube_结构化提取, youtube_精炼提取, youtube_专业课笔记, 爆款短视频文案, youtube_视频总结")
+    parser.add_argument("--prompt_template", required=False, default="default课堂笔记", help="选择摘要提示词模板，可选: default课堂笔记, youtube_英文笔记, youtube_结构化提取, youtube_精炼提取, youtube_专业课笔记, 爆款短视频文案, youtube_视频总结")
     args = parser.parse_args()
 
     # 创建总结内容文件夹
@@ -79,13 +79,14 @@ def main():
     audio_path = download_audio(args.url)
     print(f"音频已保存: {audio_path}")
 
-    print("[2/3] 转录音频...")
-    transcript = transcribe_audio(audio_path)
+    print(f"[2/3] 转录音频 (使用模型: {args.model})...")
+    print("提示：转录过程可能需要几分钟时间，请耐心等待...")
+    transcript = transcribe_audio(audio_path, model=args.model)
     print("转录完成！")
 
     print("[3/3] 结构化总结...")
     # 优先使用 --prompt，如果没有则用模板
-    prompt_to_use = args.prompt if args.prompt else prompt_templates.get(args.prompt_template, prompt_templates["default"])
+    prompt_to_use = args.prompt if args.prompt else prompt_templates.get(args.prompt_template, prompt_templates["default课堂笔记"])
     summary = summarize_text(transcript, prompt=prompt_to_use)
     print("摘要完成！")
 

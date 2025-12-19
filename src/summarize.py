@@ -8,7 +8,7 @@ import requests
 
 from .prompts import prompt_default, prompt_templates
 
-DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 
 def split_text(text, max_len=15000):
@@ -39,7 +39,7 @@ def summarize_text(text: str, prompt: Optional[str] = None, model: str = "deepse
     :return: 结构化摘要文本
     """
     def call_api(chunk):
-        api_key = "sk-274601783bc6409da786452b75ff39d0"
+        api_key = "sk-82ea2cd0ff7c47548b0a4a72e7e697ce"
         p = prompt if prompt else prompt_default
         p = p + "\n" + chunk
         headers = {
@@ -55,7 +55,6 @@ def summarize_text(text: str, prompt: Optional[str] = None, model: str = "deepse
             "stream": False
         }
         response = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=120)
-        print("DeepSeek API 响应：", response.text)
         response.raise_for_status()
         data = response.json()
         return data["choices"][0]["message"]["content"].strip()
@@ -70,6 +69,3 @@ def summarize_text(text: str, prompt: Optional[str] = None, model: str = "deepse
         print("摘要结果仍超长，递归再次摘要...")
         return summarize_text(summary_text, prompt, model)
     return summary_text
-
-# 使用方法：
-# API 密钥已硬编码在函数中。

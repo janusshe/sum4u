@@ -7,7 +7,8 @@
 - **多平台支持**: 支持YouTube和Bilibili视频下载
 - **智能音频提取**: 自动提取视频音频并转换为MP3格式
 - **高质量转录**: 使用OpenAI Whisper进行本地音频转录，支持99种语言自动检测
-- **AI智能总结**: 使用DeepSeek或OpenAI GPT API生成结构化总结
+- **AI智能总结**: 使用多种AI模型生成结构化总结
+- **灵活提示词**: 支持预设模板和自定义提示词
 - **自动文件管理**: 智能命名和保存结果文件
 - **中文友好**: 完全支持中文界面和内容处理
 
@@ -55,6 +56,19 @@ sudo apt update && sudo apt install ffmpeg
 # 从 https://ffmpeg.org/download.html 下载
 ```
 
+### 5. Whisper模型下载
+首次运行时，Whisper模型会自动从OpenAI下载到本地缓存（通常在 `~/.cache/whisper/` 目录）：
+- `tiny` 模型：约75MB
+- `base` 模型：约142MB
+- `small` 模型：约466MB（默认）
+- `medium` 模型：约1.5GB
+- `large` 模型：约2.9GB
+
+如果网络较慢，可以预先下载模型：
+```bash
+python3 -c "import whisper; whisper.load_model('small')"
+```
+
 ## 🔑 API密钥配置
 
 本工具已内置API密钥，无需用户手动配置。
@@ -63,17 +77,17 @@ sudo apt update && sudo apt install ffmpeg
 
 ### 1. 使用快速启动脚本 (推荐)
 
-为了简化操作，项目提供了 `start.sh` 脚本，可以交互式地选择总结模板。
+为了简化操作，项目提供了 `start.sh` 脚本，可以交互式地选择总结模板或自定义提示词。
 
 ```bash
 ./start.sh "视频URL"
 ```
 
-脚本会自动激活虚拟环境、运行主程序，并引导您选择一个预设的总结模板。
+脚本会自动激活虚拟环境、运行主程序，并引导您选择一个预设的总结模板或输入自定义提示词。
 
 ### 2. 直接运行主程序
 
-您也可以直接运行 `main.py` 并通过参数指定总结模板或自定义提示词。
+您也可以直接运行 `src/main.py` 并通过参数指定总结模板或自定义提示词。
 
 ```bash
 # 使用预设模板
@@ -81,9 +95,26 @@ python3 src/main.py --url "视频URL" --prompt_template "模板名称"
 
 # 使用自定义提示词
 python3 src/main.py --url "视频URL" --prompt "你的自定义提示词"
+
+# 设置Whisper模型大小
+python3 src/main.py --url "视频URL" --model "medium"
 ```
 
-可用的模板名称请参考 `src/prompts.py` 文件。
+可用的Whisper模型大小：
+- `tiny`: 最快但准确性最低 (约32x实时速度)
+- `base`: 快速且准确 (约16x实时速度)
+- `small`: 平衡速度和准确性 (约6x实时速度) - 默认值
+- `medium`: 较慢但更准确 (约2x实时速度)
+- `large`, `large-v1`, `large-v2`, `large-v3`: 最准确但最慢 (接近实时速度)
+
+可用的模板名称包括：
+- `default课堂笔记`: 通用课堂笔记格式，适合大多数教学视频
+- `youtube_英文笔记`: 专门用于英文视频的双语笔记格式
+- `youtube_结构化提取`: 以结构化方式提取要点
+- `youtube_精炼提取`: 提取核心要点和精华
+- `youtube_专业课笔记`: 适用于教学视频的专业笔记格式
+- `爆款短视频文案`: 适用于短视频内容的文案风格
+- `youtube_视频总结`: 综合性视频总结模板
 
 
 
@@ -112,14 +143,21 @@ video_summarizer_cli/
 
 ```
 video_summarizer_cli/
-├── main.py              # 主程序入口
-├── audio.py             # 音频下载和提取模块
-├── transcribe.py        # 音频转录模块
-├── summarize.py         # AI总结模块
-├── utils.py             # 工具函数模块
-├── requirements.txt     # 依赖包列表
-├── README.md           # 项目说明文档
-└── summaries/          # 输出文件夹
+├── src/                  # 主要源代码
+│   ├── main.py           # 主程序入口
+│   ├── audio.py          # 音频下载和提取模块
+│   ├── transcribe.py     # 音频转录模块
+│   ├── summarize.py      # AI总结模块
+│   ├── prompts.py        # 预设提示词模板
+│   └── utils.py          # 工具函数模块
+├── summaries/            # 输出总结文件
+├── downloads/            # 下载的音频文件
+├── transcriptions/       # 转录文本文件
+├── requirements.txt      # 依赖包列表
+├── pyproject.toml        # 项目配置文件
+├── uv.lock               # uv依赖锁定文件
+├── README.md             # 项目说明文档
+└── start.sh              # 快速启动脚本
 ```
 
 ## 🆕 使用uv管理与项目结构

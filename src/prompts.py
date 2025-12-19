@@ -4,144 +4,175 @@ prompts.py
 """
 
 prompt_default="""
-你是一个知识总结专家，以下是某知识类视频的转录文本，请按要求结构化输出 Markdown：
-1.结构化转录内容，尽量接近原文罗列所有观点信息
-2. 生成一个 **简要概述（3–5 句）**，突出视频核心主题，并输出一个H2标题。
-3. 用 **H3 标题**区分以下部分：
-**关键概念（Key Concepts）**：
-   - 用**粗体**标出专业术语，并简短解释。
-   - 主要观点（Main Points）：按照出现顺序，用**有序列表**列出 5–8 条。
-   - 实用建议（Takeaways）：用**无序列表**列出 3–5 条实用建议。
-4. ✅ 强调适用人群（例如学生、高管、开发者）。
-5. ⚠️ 如果内容丰富，可在每段末尾加一句总结。
-6. 输出时只包含 Markdown，不要附加额外解释。  
+# 视频课程笔记生成 Prompt
+
+请基于提供的视频转录文字，生成一份结构化的学习笔记。要求如下：
+
+## 输出要求
+
+### 1. 文档头部信息
+- 视频标题
+- 视频来源（YouTube/Bilibili）
+- 视频链接（如有）
+- 视频时长
+- 笔记生成日期
+
+### 2. 全文主题和内容框架（Mermaid 图）(仔细确认语法，a确保无错误)
+根据文章结构内容使用合适的Mermaid图表， Mermaid mindmap 或 flowchart 语法，生成视频内容的思维导图，要求：
+- 清晰展示主题和各级子主题的层级关系
+- 包含所有重要知识点模块
+- 使用简洁的关键词标注
+
+### 3. 内容分段总结
+对视频内容进行时间轴分段，每个分段包含：
+- **时间戳**：该段内容对应的视频时间
+- **段落标题**：该段的核心主题（10字以内）
+- **核心内容**：
+  - 高度还原讲师的表达逻辑和语言风格
+  - 保留关键术语、概念定义、示例说明
+  - 提炼核心观点，但不改变原意
+  - 包含重要的代码示例、公式或图表说明（如有）
+- **关键要点**：用 bullet points 列出该段的核心知识点（3-5个）
+
+### 4. 全文总结
+- **核心观点**：整个视频的主要论点或教学目标（3-5句话）
+- **关键收获**：最重要的知识点或技能（5-8个 bullet points）
+- **适用场景**：这些知识可以应用在哪些实际场景
+- **延伸学习**：建议的后续学习方向或相关主题
+
+### 5. 术语表（可选）
+如果视频涉及专业术语，列出：
+- 术语名称
+- 简明解释
+- 在视频中的使用场景
+
+## 内容要求
+
+1. **准确性**：忠实还原视频内容，不添加视频中未提及的信息
+2. **结构化**：使用 Markdown 标题层级清晰组织内容
+3. **可读性**：
+   - 使用代码块标注代码示例
+   - 使用引用块标注重要观点
+   - 使用表格整理对比性内容
+   - 使用列表突出要点
+4. **完整性**：涵盖视频的所有重要内容，不遗漏关键信息
+
+## 输出格式
+
+以 Markdown (.md) 格式输出，文件名格式：`[视频标题]_学习笔记_[日期].md`
+
+---
+
 """
 
 prompt_1 = """
-你是一位专业知识翻译与整理专家，擅长将英文课程视频内容进行精准翻译、核心信息提取，并以清晰的结构输出学习笔记。
+# 英文视频课程笔记生成 Prompt
 
-请完成以下任务：
-1. 将原文英文逐段翻译成准确自然的中文。
-2. 每段内容后进行简明总结（1-2句），提取关键词和核心概念。
-3. 最后使用 Markdown 格式结构化输出，包含以下部分：
+Please generate structured learning notes based on the provided video transcript. Requirements:
 
-## 📄 原文英文  
-（每段展示）
+## Output Requirements
 
-## 🈶 中文翻译  
-（每段对应翻译）
+### 1. Document Header
+- Video Title
+- Source (YouTube/Bilibili)
+- Video Link (if available)
+- Duration
+- Note Creation Date
 
-## 🧠 重点摘要  
-- 段落要点总结
-- 专业术语与解释
+### 2. Content Framework (Mermaid Diagram)
+Generate a Mermaid mindmap or flowchart to visualize the video's content structure:
+- Clearly show the hierarchy of main topics and subtopics
+- Include all important knowledge modules
+- Use concise keywords for labeling
 
-请开始处理以下内容：
+### 3. Segmented Content Summary
+Divide the video content by timeline, each segment includes:
+- **Timestamp**: Video time for this segment
+- **Section Title**: Core topic (within 10 words)
+- **Core Content**:
+  - Faithfully restore the instructor's logic and language style
+  - Preserve key terms, concept definitions, and examples
+  - Extract core viewpoints without changing the original meaning
+  - Include important code examples, formulas, or diagrams (if any)
+  - **Keep all content in English**
+- **Key Points**: List 3-5 core knowledge points in bullet format
+
+### 4. Overall Summary
+- **Core Arguments**: Main points or teaching objectives (3-5 sentences)
+- **Key Takeaways**: Most important knowledge or skills (5-8 bullet points)
+- **Use Cases**: Practical scenarios where this knowledge applies
+- **Further Learning**: Suggested follow-up topics or learning directions
+
+### 5. Bilingual Glossary (REQUIRED)
+For technical terms and key concepts:
+- **English Term**
+- **Chinese Translation** (中文翻译)
+- **Definition/Explanation** (in English)
+- **Context in Video** (usage scenario)
+
+Format:
+```
+| English Term | 中文翻译 | Definition | Context |
+|--------------|---------|------------|---------|
+| ... | ... | ... | ... |
+```
+
+### 6. Key Vocabulary Section
+Extract 20-30 important words/phrases with:
+- **English Expression**
+- **中文含义**
+- **Example Sentence** (from video context)
+
+## Content Requirements
+
+1. **Accuracy**: Faithfully represent video content without adding unmentioned information
+2. **Structure**: Use clear Markdown heading hierarchy
+3. **Readability**:
+   - Use code blocks for code examples
+   - Use blockquotes for important viewpoints
+   - Use tables for comparative content
+   - Use lists to highlight key points
+4. **Completeness**: Cover all important content without omitting key information
+5. **Language**: 
+   - Main content in **English**
+   - Add Chinese translations for technical terms
+   - Bilingual glossary required
+
+## Output Format
+
+Output in Markdown (.md) format
+Filename: `[Video_Title]_Notes_[Date].md`
+
+---
+
+**Please process the following video transcript:**
+
+[Paste video transcript here]
 """
 
 prompt_2 = """
-你是我的知识架构整理助手，请根据以下英文内容：
-1. 将其翻译为准确的中文。
-2. 提取出每段的知识点，建立层级结构，标出概念、定义、例子。
-3. 使用 Markdown 格式输出，适合用于建立学习笔记或知识图谱。
-
-输出结构参考如下：
-
-## 🧩 知识结构  
-- **主题1：** 定义 + 举例  
-- **主题2：** 原理 + 应用  
-
-## 📝 中文翻译  
-（逐段翻译原文）
-
-## 🧠 我的理解（预留空行）
-
-原文如下：
 
 """
 
 prompt_3 = """
-你是一位内容精炼大师，请对以下英文视频文本完成以下操作：
 
-1. 将每一段英文翻译为简明、自然、专业的中文。
-2. 每段后提炼核心观点，生成一句话总结。
-3. 衍生出1~2个延伸思考问题，用于引导深入理解。
-4. 使用 Markdown 输出以下格式：
-
----
-
-## 🎬 内容段落1
-**英文：**  
-...  
-**中文翻译：**  
-...  
-**观点总结：**  
-...  
-**延伸问题：**  
-- Q1:  
-- Q2:
-
----
-
-以下是原文内容：
 """
 
 prompt_4 = """
-你是专业课程笔记助手。请根据以下英文视频内容：
 
-1. 将内容按自然结构划分为多个「知识章节」。
-2. 每章内先展示英文原文 → 中文翻译 → 概念要点。
-3. 输出时请将每一章以 Markdown 格式输出，并附带章节编号与标题。
-4. 在最后附一份总结清单：
-
-输出格式如下：
-
----
-
-# 第1章：神经网络的基本结构
-## 📄 原文  
-...  
-## 🈶 中文  
-...  
-## 🔍 核心要点  
-- 输入层
-- 激活函数
-- 权重调整机制
-
----
-
-# 📚 全文要点清单
-- 概念1：...
-- 概念2：...
 """
 
 prompt_5 = """
-你是一个专业的视频文案助手，擅长根据文档内容创作短视频爆款文案。
-1. 根据提供的文档内容，提炼核心内容并转化为短视频爆款文案，文档核心内容转化为顺畅口头表达的文字
-2. 创作吸引用户点击的标题和开头，节奏和情绪调动技巧适当。 
-3. 优化文案结构，增强用户互动，例如在中间加入“如果视频对您有帮助的话，可以关注我分享更多内容”  
-4. 视频内容面向群体为中老年，请使用符合该群体的的表达方式和风格
-5. 文案要求500字左右，不要太长。如果内容核心总结预计超过800字，可以分成多段
-6. 输出为txt，只带用于正常的断句标点符号，不需要其他符号和场景解释。纯口播文字
+
 """
 
 prompt_6 = """
-你是一个结构化视频总结引擎，请对以下英文转录文本：
 
-1. 自动识别自然段落
-2. 每段翻译为中文
-3. 提取段落核心内容（不少于3点）
-4. 每段使用 Markdown 输出，包含：
-   - 中文翻译  
-   - 核心观点（3点以上）  
-   - 关键词提取（5个）  
-5. 最后生成一份【整片总结】与【学习建议】
-
-这是原始转录内容：
 """
 
 prompt_templates = {
-    "default": prompt_default,
-    "youtube_全面提取": prompt_1,
+    "default课堂笔记": prompt_default,
+    "youtube_英文笔记": prompt_1,
     "youtube_结构化提取": prompt_2,
     "youtube_精炼提取": prompt_3,
     "youtube_专业课笔记": prompt_4,
