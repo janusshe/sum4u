@@ -7,7 +7,7 @@ import os
 import shutil
 from pathlib import Path
 from typing import Optional
-from .utils import safe_filename
+from utils import safe_filename
 
 
 def validate_audio_file(file_path: str) -> bool:
@@ -64,35 +64,69 @@ def convert_audio_format(input_path: str, output_path: str, target_format: str =
     :return: 转换后的音频文件路径
     """
     try:
-        from moviepy.editor import AudioFileClip
-        
+        # 尝试导入moviepy 2.x版本的模块
+        try:
+            from moviepy import AudioFileClip
+        except ImportError:
+            from moviepy.editor import AudioFileClip
+
         # 检查输入文件是否存在
         if not os.path.exists(input_path):
             raise FileNotFoundError(f"输入音频文件不存在: {input_path}")
-        
+
         # 使用moviepy进行格式转换
         audio_clip = AudioFileClip(input_path)
-        
+
         # 确保输出目录存在
         output_dir = os.path.dirname(output_path)
         os.makedirs(output_dir, exist_ok=True)
-        
+
         # 导出为指定格式
         if target_format.lower() == ".mp3":
-            audio_clip.write_audiofile(output_path, verbose=False, logger=None)
+            audio_clip.write_audiofile(output_path, logger=None)
         elif target_format.lower() == ".wav":
-            audio_clip.write_audiofile(output_path, verbose=False, logger=None)
+            audio_clip.write_audiofile(output_path, logger=None)
         else:
             # 默认转换为mp3
             output_path = output_path.rsplit('.', 1)[0] + ".mp3"
-            audio_clip.write_audiofile(output_path, verbose=False, logger=None)
-        
+            audio_clip.write_audiofile(output_path, logger=None)
+
         # 关闭音频剪辑
         audio_clip.close()
-        
+
         return output_path
     except ImportError:
-        raise ImportError("未找到 moviepy，请先运行 pip install moviepy 安装依赖。")
+        # 检查moviepy是否已安装
+        try:
+            import subprocess
+            import sys
+            subprocess.check_call([sys.executable, "-m", "pip", "show", "moviepy"])
+        except subprocess.CalledProcessError:
+            print("检测到moviepy未安装，正在尝试安装...")
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", "moviepy"])
+                print("moviepy安装成功！")
+                # 重新导入并执行 - 兼容不同版本的moviepy
+                try:
+                    from moviepy import AudioFileClip
+                except ImportError:
+                    from moviepy.editor import AudioFileClip
+                audio_clip = AudioFileClip(input_path)
+                output_dir = os.path.dirname(output_path)
+                os.makedirs(output_dir, exist_ok=True)
+                if target_format.lower() == ".mp3":
+                    audio_clip.write_audiofile(output_path, logger=None)
+                elif target_format.lower() == ".wav":
+                    audio_clip.write_audiofile(output_path, logger=None)
+                else:
+                    output_path = output_path.rsplit('.', 1)[0] + ".mp3"
+                    audio_clip.write_audiofile(output_path, logger=None)
+                audio_clip.close()
+                return output_path
+            except Exception as install_error:
+                raise ImportError("自动安装moviepy失败，请手动运行 'pip install moviepy' 安装依赖。") from install_error
+        else:
+            raise ImportError("moviepy已安装但无法导入，可能存在版本兼容性问题。请尝试重新安装：'pip install --force-reinstall moviepy'。")
     except Exception as e:
         raise RuntimeError(f"音频格式转换失败: {e}")
 
