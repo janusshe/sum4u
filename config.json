@@ -1,0 +1,14 @@
+{
+  "api_keys": {
+    "deepseek": "sk-fb81c0bbbe3145d383d82c25beeaeff4",
+    "openai": "",
+    "anthropic": ""
+  },
+  "default_model": "deepseek-chat",
+  "default_language": "auto",
+  "output_settings": {
+    "transcription_folder": "transcriptions",
+    "summary_folder": "summaries",
+    "download_folder": "downloads"
+  }
+}
